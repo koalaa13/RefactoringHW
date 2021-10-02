@@ -22,7 +22,7 @@ public class Database {
 
     public void createProductsTable() throws SQLException {
         try (Connection c = DriverManager.getConnection(getUrl())) {
-            String sql = SQLQueryBuilder.getCreateTableSQLQuery("PRODUCT",
+            String sql = SQLQueryBuilder.buildCreateTableSQLQuery("PRODUCT",
                     new SQLAttribute("NAME", "TEXT", false),
                     new SQLAttribute("PRICE", "INT", false));
             Statement stmt = c.createStatement();
