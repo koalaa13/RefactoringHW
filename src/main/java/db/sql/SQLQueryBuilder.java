@@ -15,13 +15,19 @@ public class SQLQueryBuilder {
         return sb.toString();
     }
 
-//    public static String buildInsertSQLQuery(String tableName, SQLAttribute... attributes) {
-////        String sql = "INSERT INTO PRODUCT " +
-////                "(NAME, PRICE) VALUES (\"" + name + "\"," + price + ")";
-//        StringBuilder sb = new StringBuilder();
-//        sb.append("INSERT INTO ").append(tableName).append(' ');
-//        sb.append('(');
-//        Arrays.stream(attributes).forEach(attributes -> sb.append(attributes.getName()).append());
-//        return sb.toString();
-//    }
+    public static String buildInsertSQLQuery(String tableName, SQLAttribute... attributes) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("INSERT INTO ").append(tableName).append(' ');
+        sb.append('(');
+        sb.append(Arrays.stream(attributes).map(SQLAttribute::getName).collect(Collectors.joining(", ")));
+        sb.append(") VALUES (");
+        sb.append(Arrays.stream(attributes).map(a -> {
+            if (a.getType().isText()) {
+                return "\"" + a.getValue() + "\"";
+            }
+            return a.getValue();
+        }).collect(Collectors.joining(",")));
+        sb.append(')');
+        return sb.toString();
+    }
 }
