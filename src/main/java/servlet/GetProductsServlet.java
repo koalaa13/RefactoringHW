@@ -1,32 +1,26 @@
 package servlet;
 
-import javax.servlet.http.HttpServlet;
+import db.Product;
+import db.ProductDatabase;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.util.List;
 
-public class GetProductsServlet extends HttpServlet {
+public class GetProductsServlet extends AbstractWithDatabaseServlet {
+    public GetProductsServlet(ProductDatabase db) {
+        super(db);
+    }
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         try {
-            try (Connection c = DriverManager.getConnection("jdbc:sqlite:test.db")) {
-                Statement stmt = c.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT * FROM PRODUCT");
-                response.getWriter().println("<html><body>");
-
-                while (rs.next()) {
-                    String name = rs.getString("name");
-                    int price = rs.getInt("price");
-                    response.getWriter().println(name + "\t" + price + "</br>");
-                }
-                response.getWriter().println("</body></html>");
-
-                rs.close();
-                stmt.close();
+            response.getWriter().println("<html><body>");
+            List<Product> products = db.findAll();
+            for (Product p : products) {
+                response.getWriter().println(p.getName() + "\t" + p.getPrice() + "</br>");
             }
+            response.getWriter().println("</html></body>");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

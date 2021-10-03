@@ -7,10 +7,9 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.lang.reflect.Method;
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,24 +31,80 @@ public class ProductDatabase {
         return SCHEMA + ":" + dbFile;
     }
 
-    public void createTable() throws SQLException {
+    @FunctionalInterface
+    private interface SQLConsumer<T> {
+        void accept(T t) throws SQLException;
+    }
+
+    private void invokeWithConnection(SQLConsumer<Connection> consumer) throws SQLException {
         try (Connection c = DriverManager.getConnection(getUrl())) {
+            consumer.accept(c);
+        }
+    }
+
+    public void create() throws SQLException {
+        invokeWithConnection(c -> {
             String sql = SQLQueryBuilder.buildCreateTableSQLQuery(TABLE_NAME, ATTRIBUTES);
             Statement stmt = c.createStatement();
 
             stmt.executeUpdate(sql);
             stmt.close();
-        }
+        });
     }
 
-    public void insertItemIntoTable(Product product) throws SQLException {
-        try (Connection c = DriverManager.getConnection(getUrl())) {
+    public void save(Product product) throws SQLException {
+        invokeWithConnection(c -> {
             String sql = SQLQueryBuilder.buildInsertSQLQuery(TABLE_NAME, getAttributesFromEntity(product));
             Statement stmt = c.createStatement();
 
             stmt.executeUpdate(sql);
             stmt.close();
+        });
+    }
+
+    public List<Product> findAll() throws SQLException {
+        List<Product> res = new ArrayList<>();
+        invokeWithConnection(c -> {
+            Statement stmt = c.createStatement();
+            ResultSet rs = stmt.executeQuery(SQLQueryBuilder.buildSelectALlSQLQuery(TABLE_NAME));
+            while (rs.next()) {
+                res.add(getEntityFromResultSet(rs));
+            }
+
+            rs.close();
+            stmt.close();
+        });
+        return res;
+    }
+
+    private Product getEntityFromResultSet(ResultSet rs) throws SQLException {
+        Product product = new Product();
+        for (SQLAttribute attr : ATTRIBUTES) {
+            Method setter;
+            try {
+                setter = new PropertyDescriptor(attr.getName().toLowerCase(), Product.class).getWriteMethod();
+            } catch (IntrospectionException e) {
+                throw new RuntimeException("Can't get setter for field " + attr.getName().toLowerCase(), e);
+            }
+            Object value;
+            switch (attr.getType()) {
+                case INT:
+                    value = rs.getInt(attr.getName());
+                    break;
+                case TEXT:
+                    value = rs.getString(attr.getName());
+                    break;
+                default:
+                    throw new RuntimeException("Can't get type of attribute");
+            }
+            try {
+                setter.invoke(product, value);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                throw new RuntimeException("Can't invoke setter for field " + attr.getName().toLowerCase());
+            }
+
         }
+        return product;
     }
 
     private SQLAttribute[] getAttributesFromEntity(Product product) {

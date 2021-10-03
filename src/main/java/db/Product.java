@@ -2,9 +2,12 @@ package db;
 
 public class Product {
     private String name;
-    private Long price;
+    private Integer price;
 
-    public Product(String name, long price) {
+    public Product() {
+    }
+
+    public Product(String name, int price) {
         this.name = name;
         this.price = price;
     }
@@ -13,7 +16,7 @@ public class Product {
         return name;
     }
 
-    public Long getPrice() {
+    public Integer getPrice() {
         return price;
     }
 
@@ -21,7 +24,7 @@ public class Product {
         this.name = name;
     }
 
-    public void setPrice(Long price) {
+    public void setPrice(Integer price) {
         this.price = price;
     }
 }
