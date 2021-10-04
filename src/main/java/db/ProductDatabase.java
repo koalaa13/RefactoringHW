@@ -12,6 +12,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 public class ProductDatabase {
@@ -39,22 +40,44 @@ public class ProductDatabase {
     }
 
     public List<Product> findAll() throws SQLException {
-        return invokeStatementExecuteQuery(SQLQueryBuilder.buildSelectAllSQLQuery(TABLE_NAME));
+        return invokeStatementExecuteQuery(
+                SQLQueryBuilder.buildSelectAllSQLQuery(TABLE_NAME),
+                new GetAllFunction());
     }
 
     public Product getMaxByPrice() throws SQLException {
         return invokeStatementExecuteQuery(
-                SQLQueryBuilder.buildSelectAllOrderBySQLQuery(TABLE_NAME, "PRICE", true, 1)).get(0);
+                SQLQueryBuilder.buildSelectAllOrderBySQLQuery(TABLE_NAME, "PRICE", true, 1),
+                new GetAllFunction())
+                .get(0);
     }
 
     public Product getMinByPrice() throws SQLException {
         return invokeStatementExecuteQuery(
-                SQLQueryBuilder.buildSelectAllOrderBySQLQuery(TABLE_NAME, "PRICE", false, 1)).get(0);
+                SQLQueryBuilder.buildSelectAllOrderBySQLQuery(TABLE_NAME, "PRICE", false, 1),
+                new GetAllFunction())
+                .get(0);
+    }
+
+    private class GetAllFunction implements SQLFunction<ResultSet, List<Product>> {
+        @Override
+        public List<Product> invoke(ResultSet resultSet) throws SQLException {
+            List<Product> res = new ArrayList<>();
+            while (resultSet.next()) {
+                res.add(getEntityFromResultSet(resultSet));
+            }
+            return res;
+        }
     }
 
     @FunctionalInterface
     private interface SQLConsumer<T> {
         void accept(T t) throws SQLException;
+    }
+
+    @FunctionalInterface
+    private interface SQLFunction<T, R> {
+        R invoke(T t) throws SQLException;
     }
 
     private void invokeWithStatement(SQLConsumer<Statement> consumer) throws SQLException {
@@ -65,16 +88,15 @@ public class ProductDatabase {
         }
     }
 
-    private List<Product> invokeStatementExecuteQuery(String query) throws SQLException {
-        List<Product> res = new ArrayList<>();
+    private <R> R invokeStatementExecuteQuery(String query, SQLFunction<ResultSet, R> function) throws SQLException {
+        // must use atomicRef here because of lambda function
+        AtomicReference<R> res = new AtomicReference<>();
         invokeWithStatement(stmt -> {
             ResultSet rs = stmt.executeQuery(query);
-            while (rs.next()) {
-                res.add(getEntityFromResultSet(rs));
-            }
+            res.set(function.invoke(rs));
             rs.close();
         });
-        return res;
+        return res.get();
     }
 
     private void invokeStatementExecuteUpdate(String query) throws SQLException {

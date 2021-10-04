@@ -52,4 +52,8 @@ public class SQLQueryBuilder {
         }
         return sb.toString();
     }
+
+    public static String buildSumBySQLQuery(String tableName, String attrName) {
+        return "SELECT SUM(" + attrName + ") FROM " + tableName;
+    }
 }
