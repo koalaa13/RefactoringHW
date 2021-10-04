@@ -50,7 +50,7 @@ public class SQLQueryBuilder {
         if (limit != null) {
             sb.append("LIMIT ").append(limit);
         }
-        return sb.toString();
+        return sb.toString().trim();
     }
 
     public static String buildAllSumBySQLQuery(String tableName, String attrName) {
