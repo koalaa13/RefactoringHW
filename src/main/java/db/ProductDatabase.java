@@ -59,6 +59,11 @@ public class ProductDatabase {
                 .get(0);
     }
 
+    public int getPricesSum() throws SQLException {
+        return invokeStatementExecuteQuery(SQLQueryBuilder.buildSumBySQLQuery(TABLE_NAME, "PRICE"),
+                rs -> rs.getInt(1));
+    }
+
     private class GetAllFunction implements SQLFunction<ResultSet, List<Product>> {
         @Override
         public List<Product> invoke(ResultSet resultSet) throws SQLException {

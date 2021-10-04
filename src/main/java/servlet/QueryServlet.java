@@ -42,21 +42,10 @@ public class QueryServlet extends AbstractWithDatabaseServlet {
             }
         } else if ("sum".equals(command)) {
             try {
-                try (Connection c = DriverManager.getConnection("jdbc:sqlite:test.db")) {
-                    Statement stmt = c.createStatement();
-                    ResultSet rs = stmt.executeQuery("SELECT SUM(price) FROM PRODUCT");
-                    response.getWriter().println("<html><body>");
-                    response.getWriter().println("Summary price: ");
-
-                    if (rs.next()) {
-                        response.getWriter().println(rs.getInt(1));
-                    }
-                    response.getWriter().println("</body></html>");
-
-                    rs.close();
-                    stmt.close();
-                }
-
+                response.getWriter().println("<html><body>");
+                response.getWriter().println("Summary price: ");
+                response.getWriter().println(db.getPricesSum());
+                response.getWriter().println("</body></html>");
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
