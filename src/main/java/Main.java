@@ -22,7 +22,7 @@ public class Main {
 
         context.addServlet(new ServletHolder(new AddProductServlet(db)), "/add-product");
         context.addServlet(new ServletHolder(new GetProductsServlet(db)), "/get-products");
-        context.addServlet(new ServletHolder(new QueryServlet()), "/query");
+        context.addServlet(new ServletHolder(new QueryServlet(db)), "/query");
 
         server.start();
         server.join();

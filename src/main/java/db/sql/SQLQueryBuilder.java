@@ -31,7 +31,25 @@ public class SQLQueryBuilder {
         return sb.toString();
     }
 
-    public static String buildSelectALlSQLQuery(String tableName) {
+    public static String buildSelectAllSQLQuery(String tableName) {
         return "SELECT * FROM " + tableName;
+    }
+
+    public static String buildSelectAllOrderBySQLQuery(String tableName,
+                                                       String attrName,
+                                                       boolean desc,
+                                                       Integer limit) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT * FROM ")
+                .append(tableName)
+                .append(" ORDER BY ")
+                .append(attrName);
+        if (desc) {
+            sb.append("DESC ");
+        }
+        if (limit != null) {
+            sb.append("LIMIT ").append(limit);
+        }
+        return sb.toString();
     }
 }

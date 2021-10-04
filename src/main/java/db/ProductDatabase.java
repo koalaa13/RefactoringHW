@@ -39,7 +39,17 @@ public class ProductDatabase {
     }
 
     public List<Product> findAll() throws SQLException {
-        return invokeStatementExecuteQuery(SQLQueryBuilder.buildSelectALlSQLQuery(TABLE_NAME));
+        return invokeStatementExecuteQuery(SQLQueryBuilder.buildSelectAllSQLQuery(TABLE_NAME));
+    }
+
+    public Product getMaxByPrice() throws SQLException {
+        return invokeStatementExecuteQuery(
+                SQLQueryBuilder.buildSelectAllOrderBySQLQuery(TABLE_NAME, "PRICE", true, 1)).get(0);
+    }
+
+    public Product getMinByPrice() throws SQLException {
+        return invokeStatementExecuteQuery(
+                SQLQueryBuilder.buildSelectAllOrderBySQLQuery(TABLE_NAME, "PRICE", false, 1)).get(0);
     }
 
     @FunctionalInterface
