@@ -2,13 +2,12 @@ package servlet;
 
 import db.Product;
 import db.ProductDatabase;
-import http.ResponseManager;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
-public class GetProductsServlet extends AbstractWithDatabaseServlet {
+public class GetProductsServlet extends AbstractServlet {
     public GetProductsServlet(ProductDatabase db) {
         super(db);
     }
@@ -16,12 +15,11 @@ public class GetProductsServlet extends AbstractWithDatabaseServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         try {
-            ResponseManager manager = new ResponseManager(response);
             List<Product> products = db.findAll();
             for (Product p : products) {
-                manager.addLine(p.getName() + "\t" + p.getPrice());
+                responseBodyManager.addLine(p.getName() + "\t" + p.getPrice());
             }
-            manager.sendResponse();
+            sendResponse(response);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

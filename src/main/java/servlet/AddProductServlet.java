@@ -2,12 +2,11 @@ package servlet;
 
 import db.Product;
 import db.ProductDatabase;
-import http.ResponseManager;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class AddProductServlet extends AbstractWithDatabaseServlet {
+public class AddProductServlet extends AbstractServlet {
     public AddProductServlet(ProductDatabase db) {
         super(db);
     }
@@ -18,9 +17,9 @@ public class AddProductServlet extends AbstractWithDatabaseServlet {
             String name = request.getParameter("name");
             int price = Integer.parseInt(request.getParameter("price"));
             db.save(new Product(name, price));
-            ResponseManager responseManager = new ResponseManager(response);
-            responseManager.setHeader("OK", 0);
-            responseManager.sendResponse();
+
+            responseBodyManager.setHeader("OK", 0);
+            sendResponse(response);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -1,20 +1,13 @@
-package http;
+package html;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ResponseManager {
-    private final HttpServletResponse response;
-    private final PrintWriter writer;
+public class ResponseBodyManager {
     private String header;
     private final List<String> lines;
 
-    public ResponseManager(HttpServletResponse response) throws IOException {
-        this.response = response;
-        this.writer = response.getWriter();
+    public ResponseBodyManager() {
         header = "";
         lines = new ArrayList<>();
     }
@@ -35,16 +28,27 @@ public class ResponseManager {
         this.lines.add(line);
     }
 
-    public void sendResponse() {
-        writer.println("<html><body>");
+    public String getResponseBody() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<html><body>").append('\n');
         if (!header.isEmpty()) {
-            writer.println(header);
+            sb.append(header).append('\n');
         }
         for (String line : lines) {
-            writer.println(line + "<br>");
+            sb.append(line).append("<br>").append('\n');
         }
-        writer.println("</body></html>");
-        response.setContentType("text/html");
-        response.setStatus(HttpServletResponse.SC_OK);
+        sb.append("</body></html>").append('\n');
+        return sb.toString();
+    }
+
+    public String getResponseBodyAndFlush() {
+        String res = getResponseBody();
+        flush();
+        return res;
+    }
+
+    public void flush() {
+        header = "";
+        lines.clear();
     }
 }
