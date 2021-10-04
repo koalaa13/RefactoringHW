@@ -2,10 +2,12 @@ package servlet;
 
 import db.Product;
 import db.ProductDatabase;
+import http.ResponseManager;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.sql.SQLException;
 
 public class QueryServlet extends AbstractWithDatabaseServlet {
     public QueryServlet(ProductDatabase db) {
@@ -15,50 +17,29 @@ public class QueryServlet extends AbstractWithDatabaseServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String command = request.getParameter("command");
-
-        if ("max".equals(command)) {
-            try {
-                response.getWriter().println("<html><body>");
-                response.getWriter().println("<h1>Product with max price: </h1>");
+        ResponseManager manager = new ResponseManager(response);
+        try {
+            if ("max".equals(command)) {
                 Product p = db.getMaxByPrice();
-                response.getWriter().println(p.getName() + "\t" + p.getPrice() + "</br>");
-                response.getWriter().println("</body></html>");
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        } else if ("min".equals(command)) {
-            try {
-                response.getWriter().println("<html><body>");
-                response.getWriter().println("<h1>Product with max price: </h1>");
+                manager.setHeader("Product with max price: ", 1);
+                manager.addLine(p.getName() + "\t" + p.getPrice());
+            } else if ("min".equals(command)) {
                 Product p = db.getMinByPrice();
-                response.getWriter().println(p.getName() + "\t" + p.getPrice() + "</br>");
-                response.getWriter().println("</body></html>");
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+                manager.setHeader("Product with min price: ", 1);
+                manager.addLine(p.getName() + "\t" + p.getPrice());
+            } else if ("sum".equals(command)) {
+                manager.setHeader("Summary price: ", 0);
+                manager.addLine(String.valueOf(db.getPricesSum()));
+            } else if ("count".equals(command)) {
+                manager.setHeader("Number of products: ", 0);
+                manager.addLine(String.valueOf(db.getCount()));
+            } else {
+                manager.setHeader("Unknown command: " + command, 1);
             }
-        } else if ("sum".equals(command)) {
-            try {
-                response.getWriter().println("<html><body>");
-                response.getWriter().println("Summary price: ");
-                response.getWriter().println(db.getPricesSum());
-                response.getWriter().println("</body></html>");
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        } else if ("count".equals(command)) {
-            try {
-                response.getWriter().println("<html><body>");
-                response.getWriter().println("Number of products: ");
-                response.getWriter().println(db.getCount());
-                response.getWriter().println("</body></html>");
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            response.getWriter().println("Unknown command: " + command);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
 
-        response.setContentType("text/html");
-        response.setStatus(HttpServletResponse.SC_OK);
+        manager.sendResponse();
     }
 }
