@@ -43,7 +43,7 @@ public class SQLQueryBuilder {
         sb.append("SELECT * FROM ")
                 .append(tableName)
                 .append(" ORDER BY ")
-                .append(attrName);
+                .append(attrName).append(' ');
         if (desc) {
             sb.append("DESC ");
         }
