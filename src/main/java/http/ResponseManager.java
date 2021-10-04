@@ -10,7 +10,7 @@ public class ResponseManager {
     private final HttpServletResponse response;
     private final PrintWriter writer;
     private String header;
-    private List<String> lines;
+    private final List<String> lines;
 
     public ResponseManager(HttpServletResponse response) throws IOException {
         this.response = response;
