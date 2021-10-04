@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-// TODO remove copy-paste 'try(get connection)'
 public class ProductDatabase {
     private static final String TABLE_NAME = "PRODUCT";
     private final String dbFile;
@@ -31,50 +30,45 @@ public class ProductDatabase {
         return SCHEMA + ":" + dbFile;
     }
 
+    public void create() throws SQLException {
+        invokeStatementExecuteUpdate(SQLQueryBuilder.buildCreateTableSQLQuery(TABLE_NAME, ATTRIBUTES));
+    }
+
+    public void save(Product product) throws SQLException {
+        invokeStatementExecuteUpdate(SQLQueryBuilder.buildInsertSQLQuery(TABLE_NAME, getAttributesFromEntity(product)));
+    }
+
+    public List<Product> findAll() throws SQLException {
+        return invokeStatementExecuteQuery(SQLQueryBuilder.buildSelectALlSQLQuery(TABLE_NAME));
+    }
+
     @FunctionalInterface
     private interface SQLConsumer<T> {
         void accept(T t) throws SQLException;
     }
 
-    private void invokeWithConnection(SQLConsumer<Connection> consumer) throws SQLException {
+    private void invokeWithStatement(SQLConsumer<Statement> consumer) throws SQLException {
         try (Connection c = DriverManager.getConnection(getUrl())) {
-            consumer.accept(c);
+            Statement stmt = c.createStatement();
+            consumer.accept(stmt);
+            stmt.close();
         }
     }
 
-    public void create() throws SQLException {
-        invokeWithConnection(c -> {
-            String sql = SQLQueryBuilder.buildCreateTableSQLQuery(TABLE_NAME, ATTRIBUTES);
-            Statement stmt = c.createStatement();
-
-            stmt.executeUpdate(sql);
-            stmt.close();
-        });
-    }
-
-    public void save(Product product) throws SQLException {
-        invokeWithConnection(c -> {
-            String sql = SQLQueryBuilder.buildInsertSQLQuery(TABLE_NAME, getAttributesFromEntity(product));
-            Statement stmt = c.createStatement();
-
-            stmt.executeUpdate(sql);
-            stmt.close();
-        });
-    }
-
-    public List<Product> findAll() throws SQLException {
+    private List<Product> invokeStatementExecuteQuery(String query) throws SQLException {
         List<Product> res = new ArrayList<>();
-        invokeWithConnection(c -> {
-            Statement stmt = c.createStatement();
-            ResultSet rs = stmt.executeQuery(SQLQueryBuilder.buildSelectALlSQLQuery(TABLE_NAME));
+        invokeWithStatement(stmt -> {
+            ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
                 res.add(getEntityFromResultSet(rs));
             }
-
             rs.close();
-            stmt.close();
         });
         return res;
+    }
+
+    private void invokeStatementExecuteUpdate(String query) throws SQLException {
+        invokeWithStatement(stmt -> stmt.executeUpdate(query));
     }
 
     private Product getEntityFromResultSet(ResultSet rs) throws SQLException {
