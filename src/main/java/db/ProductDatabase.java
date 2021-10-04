@@ -60,7 +60,12 @@ public class ProductDatabase {
     }
 
     public int getPricesSum() throws SQLException {
-        return invokeStatementExecuteQuery(SQLQueryBuilder.buildSumBySQLQuery(TABLE_NAME, "PRICE"),
+        return invokeStatementExecuteQuery(SQLQueryBuilder.buildAllSumBySQLQuery(TABLE_NAME, "PRICE"),
+                rs -> rs.getInt(1));
+    }
+
+    public int getCount() throws SQLException {
+        return invokeStatementExecuteQuery(SQLQueryBuilder.buildAllCountSQLQuery(TABLE_NAME),
                 rs -> rs.getInt(1));
     }
 
