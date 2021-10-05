@@ -16,7 +16,7 @@ public class ResponseBodyManager {
      * @param header      text of header
      * @param headerLevel if =1 will use \<h1> if =2 will use \<h2> and etc =0 for without tag usage
      */
-    public void setHeader(String header, Integer headerLevel) {
+    public void setHeader(String header, int headerLevel) {
         if (headerLevel == 0) {
             this.header = header;
         } else {
