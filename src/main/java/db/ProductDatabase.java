@@ -46,17 +46,23 @@ public class ProductDatabase {
     }
 
     public Product getMaxByPrice() throws SQLException {
-        return invokeStatementExecuteQuery(
+        var found = invokeStatementExecuteQuery(
                 SQLQueryBuilder.buildSelectAllOrderBySQLQuery(TABLE_NAME, "PRICE", true, 1),
-                new GetAllFunction())
-                .get(0);
+                new GetAllFunction());
+        if (found.isEmpty()) {
+            return null;
+        }
+        return found.get(0);
     }
 
     public Product getMinByPrice() throws SQLException {
-        return invokeStatementExecuteQuery(
+        var found = invokeStatementExecuteQuery(
                 SQLQueryBuilder.buildSelectAllOrderBySQLQuery(TABLE_NAME, "PRICE", false, 1),
-                new GetAllFunction())
-                .get(0);
+                new GetAllFunction());
+        if (found.isEmpty()) {
+            return null;
+        }
+        return found.get(0);
     }
 
     public int getPricesSum() throws SQLException {

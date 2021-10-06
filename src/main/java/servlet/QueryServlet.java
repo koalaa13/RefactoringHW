@@ -19,12 +19,20 @@ public class QueryServlet extends AbstractServlet {
         try {
             if ("max".equals(command)) {
                 Product p = db.getMaxByPrice();
-                responseBodyManager.setHeader("Product with max price: ", 1);
-                responseBodyManager.addLine(p.getName() + "\t" + p.getPrice());
+                if (p == null) {
+                    responseBodyManager.setHeader("There is no products.", 1);
+                } else {
+                    responseBodyManager.setHeader("Product with max price: ", 1);
+                    responseBodyManager.addLine(p.getName() + "\t" + p.getPrice());
+                }
             } else if ("min".equals(command)) {
                 Product p = db.getMinByPrice();
-                responseBodyManager.setHeader("Product with min price: ", 1);
-                responseBodyManager.addLine(p.getName() + "\t" + p.getPrice());
+                if (p == null) {
+                    responseBodyManager.setHeader("There is no products.", 1);
+                } else {
+                    responseBodyManager.setHeader("Product with min price: ", 1);
+                    responseBodyManager.addLine(p.getName() + "\t" + p.getPrice());
+                }
             } else if ("sum".equals(command)) {
                 responseBodyManager.setHeader("Summary price: ", 0);
                 responseBodyManager.addLine(String.valueOf(db.getPricesSum()));
