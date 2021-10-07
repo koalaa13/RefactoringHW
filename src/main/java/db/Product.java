@@ -1,7 +1,5 @@
 package db;
 
-import java.util.Objects;
-
 public class Product {
     private String name;
     private Integer price;
@@ -23,8 +21,8 @@ public class Product {
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(name, price);
+    public String toString() {
+        return name + '\t' + price;
     }
 
     public String getName() {

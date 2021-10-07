@@ -17,7 +17,7 @@ public class GetProductsServlet extends AbstractServlet {
         try {
             List<Product> products = db.findAll();
             for (Product p : products) {
-                responseBodyManager.addLine(p.getName() + "\t" + p.getPrice());
+                responseBodyManager.addLine(p.toString());
             }
             sendResponse(response);
         } catch (Exception e) {

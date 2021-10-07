@@ -62,7 +62,7 @@ class GetProductsServletTest {
             db.save(p);
         }
         String rightResponse = PRODUCTS.stream()
-                .map(p -> p.getName() + "\t" + p.getPrice())
+                .map(Product::toString)
                 .collect(Collectors.joining("<br>\n"));
         HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals("<html><body>\n" + rightResponse + "<br>\n</body></html>\n", response.body());

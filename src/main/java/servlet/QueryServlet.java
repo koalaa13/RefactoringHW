@@ -23,7 +23,7 @@ public class QueryServlet extends AbstractServlet {
                     responseBodyManager.setHeader("There is no products.", 1);
                 } else {
                     responseBodyManager.setHeader("Product with max price: ", 1);
-                    responseBodyManager.addLine(p.getName() + "\t" + p.getPrice());
+                    responseBodyManager.addLine(p.toString());
                 }
             } else if ("min".equals(command)) {
                 Product p = db.getMinByPrice();
@@ -31,14 +31,14 @@ public class QueryServlet extends AbstractServlet {
                     responseBodyManager.setHeader("There is no products.", 1);
                 } else {
                     responseBodyManager.setHeader("Product with min price: ", 1);
-                    responseBodyManager.addLine(p.getName() + "\t" + p.getPrice());
+                    responseBodyManager.addLine(p.toString());
                 }
             } else if ("sum".equals(command)) {
-                responseBodyManager.setHeader("Summary price: ", 0);
-                responseBodyManager.addLine(String.valueOf(db.getPricesSum()));
+                responseBodyManager.setHeader("Summary price: " + db.getPricesSum(), 0);
             } else if ("count".equals(command)) {
-                responseBodyManager.setHeader("Number of products: ", 0);
-                responseBodyManager.addLine(String.valueOf(db.getCount()));
+                responseBodyManager.setHeader("Number of products: " + db.getCount(), 0);
+            } else if (command == null) {
+                responseBodyManager.setHeader("Should type a command.", 1);
             } else {
                 responseBodyManager.setHeader("Unknown command: " + command, 1);
             }
