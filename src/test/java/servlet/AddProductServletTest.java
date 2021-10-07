@@ -23,6 +23,7 @@ class AddProductServletTest {
     private static final int PORT = 8082;
     private static final Server SERVER = new Server(PORT);
     private static final String RESPONSE_BODY_FOR_CORRECT_REQUEST = "<html><body>\nOK\n</body></html>\n";
+    private static final String SERVLET_PATH = "/add-product";
 
     @BeforeAll
     public static void beforeAll() throws Exception {
@@ -36,14 +37,14 @@ class AddProductServletTest {
         context.setContextPath("/");
         SERVER.setHandler(context);
 
-        context.addServlet(new ServletHolder(new AddProductServlet(db)), "/add-product");
+        context.addServlet(new ServletHolder(new AddProductServlet(db)), SERVLET_PATH);
         SERVER.start();
     }
 
     @Test
     public void correctQueryTest() throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder(
-                        URI.create("http://localhost:" + PORT + "/add-product?name=phone&price=333"))
+                        URI.create("http://localhost:" + PORT + SERVLET_PATH + "?name=phone&price=333"))
                 .header("accept", "text/html")
                 .build();
 
@@ -54,7 +55,7 @@ class AddProductServletTest {
     @Test
     public void noNameRequestTest() throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder(
-                        URI.create("http://localhost:" + PORT + "/add-product?price=333"))
+                        URI.create("http://localhost:" + PORT + SERVLET_PATH + "?price=333"))
                 .header("accept", "text/html")
                 .build();
         HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -66,7 +67,7 @@ class AddProductServletTest {
     @Test
     public void noPriceRequestTest() throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder(
-                        URI.create("http://localhost:" + PORT + "/add-product?name=phone"))
+                        URI.create("http://localhost:" + PORT + SERVLET_PATH + "?name=phone"))
                 .header("accept", "text/html")
                 .build();
         HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
