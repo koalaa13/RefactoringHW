@@ -75,6 +75,10 @@ public class ProductDatabase {
                 rs -> rs.getInt(1));
     }
 
+    public void clearData() throws SQLException {
+        invokeStatementExecuteUpdate(SQLQueryBuilder.buildClearTableSQLQuery(TABLE_NAME));
+    }
+
     private class GetAllFunction implements SQLFunction<ResultSet, List<Product>> {
         @Override
         public List<Product> invoke(ResultSet resultSet) throws SQLException {

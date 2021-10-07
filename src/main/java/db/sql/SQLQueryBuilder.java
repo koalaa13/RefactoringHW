@@ -60,4 +60,8 @@ public class SQLQueryBuilder {
     public static String buildAllCountSQLQuery(String tableName) {
         return "SELECT COUNT(*) FROM " + tableName;
     }
+
+    public static String buildClearTableSQLQuery(String tableName) {
+        return "DELETE FROM " + tableName;
+    }
 }

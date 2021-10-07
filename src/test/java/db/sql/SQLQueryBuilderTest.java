@@ -72,4 +72,11 @@ class SQLQueryBuilderTest {
         String query = SQLQueryBuilder.buildAllCountSQLQuery("PRODUCT");
         assertEquals(rightQuery, query);
     }
+
+    @Test
+    void buildDropTableSQLQuery() {
+        String rightQuery = "DELETE FROM PRODUCT";
+        String query = SQLQueryBuilder.buildClearTableSQLQuery("PRODUCT");
+        assertEquals(rightQuery, query);
+    }
 }

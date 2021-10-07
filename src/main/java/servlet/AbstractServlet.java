@@ -18,9 +18,8 @@ public abstract class AbstractServlet extends HttpServlet {
         this.responseBodyManager = new ResponseBodyManager();
     }
 
-    // TODO write test with a few get-products request
     protected void setResponseBody(HttpServletResponse response) throws IOException {
-        response.getWriter().println(responseBodyManager.getResponseBodyAndFlush());
+        response.getWriter().print(responseBodyManager.getResponseBodyAndFlush());
     }
 
     protected void setResponseContentType(HttpServletResponse response) {

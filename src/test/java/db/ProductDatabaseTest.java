@@ -96,4 +96,16 @@ class ProductDatabaseTest {
         Product maxPriceProduct = db.getMaxByPrice();
         assertTrue(Set.of("apple", "TV").contains(maxPriceProduct.getName()));
     }
+
+    @Test
+    public void dropDataTest() throws SQLException {
+        saveAllProducts();
+        db.clearData();
+        List<Product> products = db.findAll();
+        assertEquals(Collections.emptyList(), products);
+        assertEquals(0, db.getCount());
+        assertEquals(0, db.getPricesSum());
+        assertNull(db.getMaxByPrice());
+        assertNull(db.getMinByPrice());
+    }
 }

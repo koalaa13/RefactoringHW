@@ -6,15 +6,13 @@ import servlet.AddProductServlet;
 import servlet.GetProductsServlet;
 import servlet.QueryServlet;
 
-public class Main {
-    private static final String dbFile = "test.db";
-    private static final ProductDatabase db = new ProductDatabase(dbFile);
-    private static final int PORT = 8081;
-
+public class App {
     public static void main(String[] args) throws Exception {
+        ProductDatabase db = new ProductDatabase(args[0]);
+        int port = Integer.parseInt(args[1]);
         db.create();
 
-        Server server = new Server(PORT);
+        Server server = new Server(port);
 
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/");
